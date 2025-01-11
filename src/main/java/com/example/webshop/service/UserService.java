@@ -1,26 +1,44 @@
 package com.example.webshop.service;
 
 import com.example.webshop.api.model.User;
+import com.example.webshop.repo.UserRepo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class UserService {
 
-    private List<User> userList;
+    @Autowired
+    private UserRepo userRepo;
 
-    public UserService() {
-        userList = new ArrayList<>();
-        User user = new User("asfdf", "me", "test@email.com");
-        User user2 = new User("asfdsasf", "me2", "more@email.com");
-        userList.addAll(Arrays.asList(user, user2));
+
+    public User saveUser(User user) {
+        return userRepo.save(user);
     }
 
     public User getUser(String id) {
-        return userList.stream().filter(u -> Objects.equals(u.getId(), id)).findFirst().orElse(null);
+        Optional<User> user = userRepo.findById(id);
+        return user.orElse(null);
+    }
+
+    public Iterable<User> getUsers() {
+        return userRepo.findAll();
+    }
+
+    public User updateUser(User user, String id) {
+        Optional<User> updateUser = userRepo.findById(id);
+        if(updateUser.isEmpty())
+            return null;
+        User getUpdateUser = updateUser.get();
+        getUpdateUser.setEmail(user.getEmail());
+        getUpdateUser.setName(user.getName());
+        return userRepo.save(getUpdateUser);
+    }
+
+    public void deleteUser(String id) {
+        System.out.println("Attempting to delete user with ID: " + id);
+        userRepo.deleteById(id);
     }
 }
