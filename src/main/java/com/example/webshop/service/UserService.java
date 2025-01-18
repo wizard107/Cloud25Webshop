@@ -5,7 +5,7 @@ import com.example.webshop.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -13,31 +13,33 @@ public class UserService {
     @Autowired
     private UserRepo userRepo;
 
-
     public User saveUser(User user) {
         return userRepo.save(user);
     }
 
-    public User getUser(String id) {
+    // Updated to use String as ID
+    public User getUser(Long id) {
         Optional<User> user = userRepo.findById(id);
-        return user.orElse(null);
+        return user.orElse(null); // Return user or null if not found
     }
 
     public Iterable<User> getUsers() {
         return userRepo.findAll();
     }
 
-    public User updateUser(User user, String id) {
+
+    public User updateUser(User user, Long id) {
         Optional<User> updateUser = userRepo.findById(id);
-        if(updateUser.isEmpty())
-            return null;
+        if (updateUser.isEmpty())
+            return null; // User not found
         User getUpdateUser = updateUser.get();
         getUpdateUser.setEmail(user.getEmail());
         getUpdateUser.setName(user.getName());
         return userRepo.save(getUpdateUser);
     }
 
-    public void deleteUser(String id) {
+    // Updated to use String as ID
+    public void deleteUser(Long id) {
         System.out.println("Attempting to delete user with ID: " + id);
         userRepo.deleteById(id);
     }
