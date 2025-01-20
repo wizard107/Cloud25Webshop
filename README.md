@@ -12,5 +12,5 @@ brew install --cask google-cloud-sdk
 
 2. Configure Google Cloud CLI
    2.1 Configure Google Cloud CLI
-   gcloud auth login
+   'gcloud auth login'
 
