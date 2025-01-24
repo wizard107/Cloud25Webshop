@@ -2,6 +2,7 @@ package com.example.webshop.service;
 
 import com.example.webshop.api.model.User;
 import com.example.webshop.repo.UserRepo;
+import com.example.webshop.utility.ObjectUpdater;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,10 +33,9 @@ public class UserService {
         Optional<User> updateUser = userRepo.findById(id);
         if (updateUser.isEmpty())
             return null; // User not found
-        User getUpdateUser = updateUser.get();
-        getUpdateUser.setEmail(user.getEmail());
-        getUpdateUser.setName(user.getName());
-        return userRepo.save(getUpdateUser);
+        User existingUser = updateUser.get();
+        ObjectUpdater.updateNonNullFields(user, existingUser);
+        return userRepo.save(existingUser);
     }
 
     // Updated to use String as ID
