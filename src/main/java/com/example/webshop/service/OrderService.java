@@ -4,6 +4,7 @@ import com.example.webshop.api.model.OrderDetails;
 import com.example.webshop.api.model.User;
 import com.example.webshop.repo.OrderRepo;
 import com.example.webshop.repo.UserRepo;
+import com.example.webshop.utility.ObjectUpdater;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,15 +33,9 @@ public class OrderService {
         Optional<OrderDetails> updateOrder = orderRepo.findById(id);
         if (updateOrder.isEmpty())
             return null; // Order not found
-        OrderDetails getUpdateOrder = updateOrder.get();
-        getUpdateOrder.setOrderDate(order.getOrderDate());
-        getUpdateOrder.setOrderStatus(order.getOrderStatus());
-        getUpdateOrder.setCurrency(order.getCurrency());
-        getUpdateOrder.setShippingAddress(order.getShippingAddress());
-        getUpdateOrder.setPaymentMethod(order.getPaymentMethod());
-        getUpdateOrder.setPaymentStatus(order.getPaymentStatus());
-        getUpdateOrder.setTotalAmount(order.getTotalAmount());
-        return orderRepo.save(getUpdateOrder);
+        OrderDetails existingOrder = updateOrder.get();
+        ObjectUpdater.updateNonNullFields(order, existingOrder);
+        return orderRepo.save(existingOrder);
     }
 
     public void deleteOrder(Long id) {
