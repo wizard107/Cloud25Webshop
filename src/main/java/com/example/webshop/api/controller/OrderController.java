@@ -1,6 +1,7 @@
 package com.example.webshop.api.controller;
 
 import com.example.webshop.api.model.OrderDetails;
+import com.example.webshop.api.model.dto.OrderDetailsDTO;
 import com.example.webshop.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +14,7 @@ public class OrderController {
     private OrderService orderService;
 
     @PostMapping(value = "/save")
-    public OrderDetails saveOrder(@RequestBody OrderDetails order) {
+    public OrderDetails saveOrder(@RequestBody OrderDetailsDTO order) {
         return orderService.saveOrder(order);
     }
 

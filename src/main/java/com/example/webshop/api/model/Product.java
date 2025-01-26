@@ -2,9 +2,10 @@ package com.example.webshop.api.model;
 
 import com.example.webshop.api.model.enums.ProductCategories;
 import jakarta.persistence.*;
+import org.springframework.lang.Nullable;
 
 @Entity
-@Table(name = "products")
+@Table(name = "product")
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,10 +17,11 @@ public class Product {
     @Enumerated(EnumType.STRING)
     private ProductCategories category;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "inventory_id", nullable = false)
     private Inventory inventory;
 
+    @Column(nullable = true)
     private Double price;
 
 
@@ -27,9 +29,13 @@ public class Product {
 
     private String color;
     private String material;
+    @Column(nullable = true)
     private int height;
+    @Column(nullable = true)
     private int width;
+    @Column(nullable = true)
     private int depth;
+    @Column(nullable = true)
     private int weight;
 
 

@@ -1,55 +1,28 @@
-package com.example.webshop.api.model;
+package com.example.webshop.api.model.dto;
 
+import com.example.webshop.api.model.Product;
 import com.example.webshop.api.model.enums.OrderStatus;
 import com.example.webshop.api.model.enums.PaymentMethod;
 import com.example.webshop.api.model.enums.PaymentStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.persistence.*;
 
-@Entity
-@Table(name = "order_details")
-public class OrderDetails {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+import java.util.List;
+
+public class OrderDetailsDTO {
 
     @JsonFormat(pattern = "dd-MM-yyyy")
     private String orderDate;
     private Double totalAmount;
     private String currency;
     private String shippingAddress;
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id", nullable = true)
-    private User user;
-    @Enumerated
+    private Long userId;
     private OrderStatus orderStatus;
-    @Enumerated
     private PaymentStatus paymentStatus;
-    @Enumerated
     private PaymentMethod paymentMethod;
+    private List<ProductDTO> products;
 
 
-    public OrderDetails() {
-    }
-
-    public OrderDetails(Long id, String orderDate, Double totalAmount, String currency, String shippingAddress, User user, OrderStatus orderStatus, PaymentStatus paymentStatus, PaymentMethod paymentMethod) {
-        this.id = id;
-        this.orderDate = orderDate;
-        this.totalAmount = totalAmount;
-        this.currency = currency;
-        this.shippingAddress = shippingAddress;
-        this.user = user;
-        this.orderStatus = orderStatus;
-        this.paymentStatus = paymentStatus;
-        this.paymentMethod = paymentMethod;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
+    public OrderDetailsDTO() {
     }
 
     public String getOrderDate() {
@@ -84,6 +57,14 @@ public class OrderDetails {
         this.shippingAddress = shippingAddress;
     }
 
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
     public OrderStatus getOrderStatus() {
         return orderStatus;
     }
@@ -108,11 +89,11 @@ public class OrderDetails {
         this.paymentMethod = paymentMethod;
     }
 
-    public User getUser() {
-        return user;
+    public List<ProductDTO> getProducts() {
+        return products;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setProducts(List<ProductDTO> products) {
+        this.products = products;
     }
 }
