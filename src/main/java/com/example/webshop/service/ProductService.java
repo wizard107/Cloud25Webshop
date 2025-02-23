@@ -3,6 +3,7 @@ package com.example.webshop.service;
 import com.example.webshop.api.model.Image;
 import com.example.webshop.api.model.Inventory;
 import com.example.webshop.api.model.Product;
+import com.example.webshop.api.model.dto.ImageDTO;
 import com.example.webshop.repo.InventoryRepo;
 import com.example.webshop.repo.OrderItemRepo;
 import com.example.webshop.repo.ProductRepo;
@@ -16,6 +17,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 @Service
@@ -72,6 +75,19 @@ public class ProductService {
 
     public Iterable<Product> getProducts() {
         return productRepo.findAll();
+    }
+
+    public List<ImageDTO> getProductImages(Long productId) {
+        Product product = productRepo.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        return product.getImages().stream()
+                .map(image -> new ImageDTO(
+                        image.getId(),
+                        gcsService.getPublicUrl(image.getGcsObjectName()),
+                        image.getPosition()
+                ))
+                .collect(Collectors.toList());
     }
 
     public Product updateProduct(Product product, Long id, List<MultipartFile> images) {

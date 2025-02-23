@@ -1,6 +1,7 @@
 package com.example.webshop.api.controller;
 
 import com.example.webshop.api.model.Product;
+import com.example.webshop.api.model.dto.ImageDTO;
 import com.example.webshop.service.ProductService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,6 +64,12 @@ public class ProductController {
         Product product = objectMapper.readValue(productJson, Product.class);
 
         return productService.updateProduct(product, id, images);
+    }
+
+    @GetMapping("/{productId}/images")
+    public ResponseEntity<?> getProductImages(@PathVariable Long productId) {
+        List<ImageDTO> images = productService.getProductImages(productId);
+        return ResponseEntity.ok(Map.of("productId", productId, "images", images));
     }
 
     // Delete a product by ID
