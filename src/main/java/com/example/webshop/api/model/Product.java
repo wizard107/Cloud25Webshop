@@ -1,8 +1,12 @@
 package com.example.webshop.api.model;
 
 import com.example.webshop.api.model.enums.ProductCategories;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import org.springframework.lang.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "product")
@@ -24,8 +28,9 @@ public class Product {
     @Column(nullable = true)
     private Double price;
 
-
-    private String imageId;
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference // Marks this as the "parent" side
+    private List<Image> images = new ArrayList<>();
 
     private String color;
     private String material;
@@ -38,19 +43,17 @@ public class Product {
     @Column(nullable = true)
     private int weight;
 
-
     public Product() {
     }
 
-
-    public Product(Long id, String name, String description, ProductCategories category, Inventory inventory, Double price, String imageId, String color, String material, int height, int width, int depth, int weight) {
+    public Product(Long id, String name, String description, ProductCategories category, Inventory inventory, Double price, List<Image> images, String color, String material, int height, int width, int depth, int weight) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.category = category;
         this.inventory = inventory;
         this.price = price;
-        this.imageId = imageId;
+        this.images = images;
         this.color = color;
         this.material = material;
         this.height = height;
@@ -59,7 +62,7 @@ public class Product {
         this.weight = weight;
     }
 
-
+    // Getters and setters...
     public Long getId() {
         return id;
     }
@@ -108,12 +111,12 @@ public class Product {
         this.price = price;
     }
 
-    public String getImageId() {
-        return imageId;
+    public List<Image> getImages() {
+        return images;
     }
 
-    public void setImageId(String imageId) {
-        this.imageId = imageId;
+    public void setImages(List<Image> images) {
+        this.images = images;
     }
 
     public String getColor() {

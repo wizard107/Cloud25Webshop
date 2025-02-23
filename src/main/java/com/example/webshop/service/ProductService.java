@@ -1,5 +1,6 @@
 package com.example.webshop.service;
 
+import com.example.webshop.api.model.Image;
 import com.example.webshop.api.model.Inventory;
 import com.example.webshop.api.model.Product;
 import com.example.webshop.repo.InventoryRepo;
@@ -9,11 +10,17 @@ import com.example.webshop.utility.ObjectUpdater;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @Service
 public class ProductService {
+    private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
 
     @Autowired
     private ProductRepo productRepo;
@@ -24,31 +31,50 @@ public class ProductService {
     @Autowired
     private InventoryRepo inventoryRepo;
 
-    // Save a product
+    @Autowired
+    private GcsService gcsService; // Inject GcsService
+
+    // Save a product with images
     @Transactional
-    public Product saveProduct(Product product) {
-        if(product.getInventory() == null || product.getInventory().getId() == null) {
-            Inventory inventory = new Inventory();
-            ObjectUpdater.updateNonNullFields(product.getInventory(), inventory);
-            inventory = inventoryRepo.save(inventory);
-            product.setInventory(inventory);
+    public Product saveProduct(Product product, List<MultipartFile> images) throws IOException {
+        logger.info("Saving product: {}", product);
+        logger.info("Number of images to upload: {}", images.size());
+
+        // Save the product to the database
+        Product savedProduct = productRepo.save(product);
+        logger.info("Product saved with ID: {}", savedProduct.getId());
+
+        // Upload images to GCS and save their metadata
+        List<Image> imageEntities = new ArrayList<>();
+        for (int i = 0; i < images.size(); i++) {
+            String objectName = "products/" + savedProduct.getId() + "/image" + (i + 1) + ".jpg";
+            logger.info("Uploading image to GCS: {}", objectName);
+
+            gcsService.uploadImage(images.get(i), objectName);
+
+            Image image = new Image();
+            image.setGcsObjectName(objectName);
+            image.setPosition(i + 1);
+            image.setProduct(savedProduct);
+            imageEntities.add(image);
         }
-        return productRepo.save(product);
+
+        savedProduct.setImages(imageEntities);
+        logger.info("Product and images saved successfully");
+
+        return productRepo.save(savedProduct);
     }
 
-    // Get a product by ID
     public Product getProduct(Long id) {
         Optional<Product> product = productRepo.findById(id);
         return product.orElse(null); // Return product or null if not found
     }
 
-    // Get all products
     public Iterable<Product> getProducts() {
         return productRepo.findAll();
     }
 
-    // Update a product
-    public Product updateProduct(Product product, Long id) {
+    public Product updateProduct(Product product, Long id, List<MultipartFile> images) {
         Optional<Product> updateProduct = productRepo.findById(id);
         if (updateProduct.isEmpty())
             return null; // Product not found
@@ -57,12 +83,28 @@ public class ProductService {
         return productRepo.save(existingProduct);
     }
 
-    // Delete a product by ID
+
     @Transactional
     public void deleteProduct(Long id) {
         System.out.println("Attempting to delete product with ID: " + id);
+
+
+        Optional<Product> productOptional = productRepo.findById(id);
+        if (productOptional.isPresent()) {
+            Product product = productOptional.get();
+
+
+            if (product.getImages() != null) {
+                for (Image image : product.getImages()) {
+                    gcsService.deleteImage(image.getGcsObjectName());
+                }
+            }
+        }
+
+
         orderItemRepo.deleteAllByProductId(id);
         inventoryRepo.deleteAllByProductId(id);
+
         productRepo.deleteById(id);
     }
 }
