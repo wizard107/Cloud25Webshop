@@ -10,13 +10,17 @@ import com.example.webshop.repo.OrderItemRepo;
 import com.example.webshop.repo.OrderRepo;
 import com.example.webshop.repo.ProductRepo;
 import com.example.webshop.repo.UserRepo;
+import com.example.webshop.utility.InvoiceGenerator;
 import com.example.webshop.utility.ObjectDTOMapper;
 import com.example.webshop.utility.ObjectUpdater;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -32,8 +36,11 @@ public class OrderService {
     @Autowired
     private OrderItemRepo orderItemRepo;
 
+    @Autowired
+    private EmailService emailService;
+
     @Transactional
-    public OrderDetails saveOrder(OrderDetailsDTO order) {
+    public OrderDetails saveOrder(OrderDetailsDTO order) throws Exception {
         OrderDetails newOrder = new OrderDetails();
         ObjectDTOMapper.updateNonNullFields(order, newOrder);
         User user = userRepo.findById(order.getUserId())
@@ -52,6 +59,9 @@ public class OrderService {
             }
             orderItemRepo.saveAll((items));
         }
+
+        //send Mail when
+        emailService.sendConfirmation(newOrder,items);
 
         return newOrder;
     }

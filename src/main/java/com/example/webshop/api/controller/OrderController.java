@@ -6,6 +6,8 @@ import com.example.webshop.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping("api/v1/webshop/order")
@@ -14,7 +16,7 @@ public class OrderController {
     private OrderService orderService;
 
     @PostMapping(value = "/save")
-    public OrderDetails saveOrder(@RequestBody OrderDetailsDTO order) {
+    public OrderDetails saveOrder(@RequestBody OrderDetailsDTO order) throws Exception {
         return orderService.saveOrder(order);
     }
 
