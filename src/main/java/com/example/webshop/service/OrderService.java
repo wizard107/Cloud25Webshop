@@ -61,7 +61,9 @@ public class OrderService {
         }
 
         //send Mail when
-        emailService.sendConfirmation(newOrder,items);
+       emailService.sendInvoice(newOrder.getUser().getEmail(),newOrder,items);
+
+        emailService.sendShipmentConfirmationWithDelay(newOrder);
 
         return newOrder;
     }
