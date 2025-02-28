@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .invoice-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .invoice-details {
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .total {
+            font-weight: bold;
+            text-align: right;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="invoice-header">
+    <h1>INVOICE</h1>
+    <p>Order #<span th:text="${order.get(1).getId()}"></span></p>
+</div>
+
+<div class="invoice-details">
+    <p><strong>Customer:</strong> <span th:text="${order.get(1).getOrder().getUser().getName()}"></span></p>
+    <p><strong>Date:</strong> <span th:text="${order.get(1).getOrder().getOrderDate()}"></span></p>
+</div>
+
+<table>
+    <thead>
+    <tr>
+        <th>Product</th>
+        <th>Quantity</th>
+        <th>Unit Price</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="item : ${order}">
+        <td th:text="${item.getProduct().getName()}"></td>
+        <td th:text="${item.getQuantity()}"></td>
+        <td th:text="${'$' + item.getProduct().getPrice()}"></td>
+    </tr>
+    </tbody>
+</table>
+
+<div class="total">
+    <p>Total Amount: $<span th:text="${order.get(1).getOrder().getTotalAmount()}"></span></p>
+</div>
+
+<div>
+    <p>Thank you for your business!</p>
+</div>
+</body>
+</html>

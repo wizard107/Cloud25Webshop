@@ -12,6 +12,7 @@ import com.example.webshop.repo.ProductRepo;
 import com.example.webshop.repo.UserRepo;
 import com.example.webshop.utility.ObjectDTOMapper;
 import com.example.webshop.utility.ObjectUpdater;
+import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,9 @@ public class OrderService {
     private ProductRepo productRepo;
     @Autowired
     private OrderItemRepo orderItemRepo;
+    @Autowired
+    private EmailService emailService;
+
 
     @Transactional
     public OrderDetails saveOrder(OrderDetailsDTO order) {
@@ -51,6 +55,13 @@ public class OrderService {
                 items.add(item);
             }
             orderItemRepo.saveAll((items));
+
+        }
+        try {
+            emailService.sendInvoiceEmail(items);
+        } catch (MessagingException e) {
+            // Log the error but don't prevent the order from being saved
+            System.err.println("Failed to send invoice email: " + e.getMessage());
         }
 
         return newOrder;
